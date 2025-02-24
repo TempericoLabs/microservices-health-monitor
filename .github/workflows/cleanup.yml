@@ -1,0 +1,53 @@
+name: Cleanup Old Docker Images
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Se ejecuta cada domingo a medianoche
+  workflow_dispatch:     # Permite ejecución manual
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete old Docker images
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const packages = await github.rest.packages.listPackagesForAuthenticatedUser({
+              package_type: 'container'
+            });
+            
+            for (const pkg of packages.data) {
+              if (pkg.name.startsWith('tempericolabs/')) {
+                console.log(`Processing package: ${pkg.name}`);
+            
+                const versions = await github.rest.packages.getAllPackageVersionsForPackageOwnedByAuthenticatedUser({
+                  package_type: 'container',
+                  package_name: pkg.name
+                });
+            
+                // Mantener solo las 5 versiones más recientes
+                const versionsToDelete = versions.data
+                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                  .slice(5);
+            
+                for (const version of versionsToDelete) {
+                  console.log(`Deleting ${pkg.name} version ${version.id}`);
+                  await github.rest.packages.deletePackageVersionForAuthenticatedUser({
+                    package_type: 'container',
+                    package_name: pkg.name,
+                    package_version_id: version.id
+                  });
+                }
+              }
+            }

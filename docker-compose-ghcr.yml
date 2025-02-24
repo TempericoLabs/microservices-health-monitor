@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  service-registry:
+    image: ghcr.io/tempericolabs/service-registry:latest
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - temperico-net
+
+  weather-service:
+    image: ghcr.io/tempericolabs/weather-service:latest
+    container_name: weather-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - service-registry
+    networks:
+      - temperico-net
+
+  dashboard-service:
+    image: ghcr.io/tempericolabs/dashboard-service:latest
+    container_name: dashboard-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - service-registry
+      - weather-service
+    networks:
+      - temperico-net
+
+  prometheus:
+    image: prom/prometheus:v2.42.0
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - temperico-net
+
+  grafana:
+    image: grafana/grafana:9.3.6
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - temperico-net
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+networks:
+  temperico-net:
