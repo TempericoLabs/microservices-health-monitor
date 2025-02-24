@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   service-registry:
-    image: ghcr.io/tempericolabs/service-registry:latest
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tempericolabs}/service-registry:latest
     container_name: service-registry
     ports:
       - "8761:8761"
@@ -10,7 +10,7 @@ services:
       - temperico-net
 
   weather-service:
-    image: ghcr.io/tempericolabs/weather-service:latest
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tempericolabs}/weather-service:latest
     container_name: weather-service
     ports:
       - "8081:8081"
@@ -20,7 +20,7 @@ services:
       - temperico-net
 
   dashboard-service:
-    image: ghcr.io/tempericolabs/dashboard-service:latest
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-tempericolabs}/dashboard-service:latest
     container_name: dashboard-service
     ports:
       - "8080:8080"
