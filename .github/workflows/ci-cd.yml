@@ -66,22 +66,22 @@ jobs:
         run: |
           cd service-registry
           mvn clean package -DskipTests
-          docker build -t ghcr.io/${{ github.repository_owner }}/service-registry:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/service-registry:latest
+          docker build -t ghcr.io/${{ env.OWNER_LC }}/service-registry:latest .
+          docker push ghcr.io/${{ env.OWNER_LC }}/service-registry:latest
 
       - name: Build Weather Service Image
         run: |
           cd weather-service
           mvn clean package -DskipTests
-          docker build -t ghcr.io/${{ github.repository_owner }}/weather-service:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/weather-service:latest
+          docker build -t ghcr.io/${{ env.OWNER_LC }}/weather-service:latest .
+          docker push ghcr.io/${{ env.OWNER_LC }}/weather-service:latest
 
       - name: Build Dashboard Service Image
         run: |
           cd dashboard-service
           mvn clean package -DskipTests
-          docker build -t ghcr.io/${{ github.repository_owner }}/dashboard-service:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/dashboard-service:latest
+          docker build -t ghcr.io/${{ env.OWNER_LC }}/dashboard-service:latest .
+          docker push ghcr.io/${{ env.OWNER_LC }}/dashboard-service:latest
 
       - name: Generate Deployment Artifacts
         run: |
